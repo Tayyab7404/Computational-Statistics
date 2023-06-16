@@ -3,12 +3,12 @@
 
 # ## Functions, Import Statements:
 
-# In[33]:
+# In[2]:
 
 
 import matplotlib.pyplot as plt
 import numpy as np
-import math
+from math import sqrt
 import scipy.stats as ss
 import pandas as pd
 
@@ -19,52 +19,29 @@ def mylen(data):
     return size
 
 def mysum(data):
-    s = 0
+    Sum = 0
     for i in data:
-        s = s + i
-    return s
+        Sum += i
+    return Sum
 
 def mymean(data):
     Sum = 0
+    n = mylen(data)
     for i in data:
-        Sum = Sum + i
-    return Sum/mylen(data)
+        Sum += i
+    return Sum/n
 
-def DET(matrix):
-    Sum = 0
-    
-    Sum = Sum + matrix[0][0] * (matrix[1][1]*matrix[2][2] - matrix[2][1]*matrix[1][2])
-    Sum = Sum - matrix[0][1] * (matrix[1][0]*matrix[2][2] - matrix[2][0]*matrix[1][2])
-    Sum = Sum + matrix[0][2] * (matrix[1][0]*matrix[2][1] - matrix[2][0]*matrix[1][1])
-    
-    return Sum
-    
-def CovXY(x, y):
-    n = mylen(x)
-    meanX = mymean(x)
-    meanY = mymean(y)
-    
-    SumXY = mysum(np.multiply(x, y))
-    
-    CovXY = SumXY/n - meanX*meanY
-    
-    return CovXY
-    
-def SD(x):
-    n = mylen(x)
-    meanx = mymean(x)
-    
-    Sumx2 = mysum(np.multiply(x, x))
-    
-    Var = Sumx2/n - meanx**2
-    
-    return math.sqrt(Var)
+# To find the f critical value
+ss.f.ppf(q=1-0.05,df=4)
+
+# To find the T critical value
+ss.t.ppf(q=1 - 0.05/2,df=4)
 
 
 # ## WEEK 1:
 # #### Write a python program to find the best fit straight line of the form y = a+bx and draw the scatter plot.
 
-# In[32]:
+# In[3]:
 
 
 # Straight Line Best Fit:
@@ -85,17 +62,20 @@ def LinearRegression(x, y):
         print("Invalid Data!")
         return
     
-    slope = (n*mysum(np.multiply(x,y)) - mysum(x)*mysum(y)) / (n*mysum(np.multiply(x,x)) - mysum(x)**2)
+    SumX = mysum(x)
+    SumY = mysum(y)
     
-    constant = (mysum(y) - slope*mysum(x)) / n
+    slope = (n*mysum(x*y) - SumX*SumY) / (n*mysum(x*x) - SumX**2)
     
-    Ycal = np.add(np.multiply(slope,x),constant)
+    constant = (SumY - slope*SumX) / n
+    
+    Ycal = slope*x + constant
     
     meanY = mymean(y)
     
-    SST = mysum(np.array([(i-meanY)**2 for i in y]))
-    SSE = mysum(np.multiply(np.subtract(y, Ycal),np.subtract(y, Ycal)))
-    SSR = mysum(np.array([(i-meanY)**2 for i in Ycal]))
+    SST = mysum([(i-meanY)**2 for i in y])
+    SSE = mysum((y-Ycal)**2)
+    SSR = mysum([(i-meanY)**2 for i in Ycal])
     
     Rsq = SSR/SST
     # Rsq = 1 - SSE/SST
@@ -118,6 +98,8 @@ def LinearRegression(x, y):
         print("The Y Calculated values is the best fit for the given data")
     else:
         print("The Y Calculated values is not the best fit for the given data")
+        
+    return Ycal
         
 x = np.array([float(i) for i in input("Enter x values: ").strip().split()])
 y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
@@ -144,19 +126,28 @@ def drawPlotParabola(x, y, Ycal):
     plt.title("Best Fit Curve")
     plt.show()
 
+def DET(matrix):
+    Sum = 0
+    
+    Sum += matrix[0][0] * (matrix[1][1]*matrix[2][2] - matrix[2][1]*matrix[1][2])
+    Sum -= matrix[0][1] * (matrix[1][0]*matrix[2][2] - matrix[2][0]*matrix[1][2])
+    Sum += matrix[0][2] * (matrix[1][0]*matrix[2][1] - matrix[2][0]*matrix[1][1])
+    
+    return Sum
+    
 def ParabolaRegression(x, y):
     n = mylen(x)
     m = mylen(y)
 
     if n != m:
-        print("Invalid Data: ")
+        print("Invalid Data!")
         return
     
-    x2 = np.multiply(x, x)
-    x3 = np.multiply(x2, x)
-    x4 = np.multiply(x3, x)
-    xy = np.multiply(x, y)
-    x2y = np.multiply(x2, y)
+    x2 = x*x
+    x3 = x2*x
+    x4 = x3*x
+    xy = x*y
+    x2y = x2*y
     
     Sumx = mysum(x)
     Sumx2 = mysum(x2)
@@ -186,13 +177,13 @@ def ParabolaRegression(x, y):
     b = delta2 / delta
     c = delta3 / delta
     
-    Ycal = np.add(a, np.add(np.multiply(b, x), np.multiply(c, x2)))
+    Ycal = a + b*x + c*x2
     
     meanY = mymean(y)
     
-    SST = mysum(np.array([(i-meanY)**2 for i in y]))
-    SSE = mysum(np.multiply(np.subtract(y, Ycal),np.subtract(y, Ycal)))
-    SSR = mysum(np.array([(i-meanY)**2 for i in Ycal]))
+    SST = mysum([(i-meanY)**2 for i in y])
+    SSE = mysum((y - Ycal)**2)
+    SSR = mysum([(i-meanY)**2 for i in Ycal])
     
     Rsq = SSR/SST
     # Rsq = 1 - SSE/SST
@@ -233,7 +224,28 @@ ParabolaRegression(x, y)
 
 
 # Karl Pearson's Correlation Coefficient:
+
+def CovXY(x, y):
+    n = mylen(x)
+    meanX = mymean(x)
+    meanY = mymean(y)
     
+    SumXY = mysum(x*y)
+    
+    CovXY = SumXY/n - meanX*meanY
+    
+    return CovXY
+    
+def SD(x):
+    n = mylen(x)
+    meanx = mymean(x)
+    
+    Sumx2 = mysum(x**2)
+    
+    var = Sumx2/n - meanx**2
+    
+    return sqrt(var)
+
 def KPCC(x, y):
     if mylen(x) != mylen(y):
         print("Invalid Data!")
@@ -266,7 +278,7 @@ KPCC = KPCC(x, y)
 # ## WEEK 4:
 # #### Write a python program to find the Spearman’s correlation coefficient between X and Y variables.
 
-# In[30]:
+# In[4]:
 
 
 # Spearman's Rank Correlation Coefficient:
@@ -277,37 +289,37 @@ def Rankify(data):
     Ranks = [None for i in range(N)]
  
     for i in range(N):
-        r = 1
-        s = 0
+        BigNums = 1
+        SameNums = 0
  
-        # Count no of bigger elements from 0 to i-1
+        # Count no of bigger elements from 0 to current number-1
         for j in range(i):
             if (data[j] > data[i]):
-                r += 1
+                BigNums += 1
             if (data[j] == data[i]):
-                s += 1
+                SameNums += 1
  
-        # Count no of bigger elements from i+1 to N-1
+        # Count no of bigger elements from current number+1 to N-1
         for j in range(i+1, N):
             if (data[j] > data[i]):
-                r += 1
+                BigNums += 1
             if (data[j] == data[i]):
-                s += 1
+                SameNums += 1
  
         # Use Fractional Rank formula
-        # fractional_rank = r + (n-1)/2
-        Ranks[i] = r + s*0.5
+        # fractional_rank = BigNums + SameNums/2
+        Ranks[i] = BigNums + SameNums/2
 
     return Ranks
 
 def RemDups(data):
-    Dup_data = []
+    RemDups = []
     
     for i in data:
-        if i not in Dup_data:
-            Dup_data.append(i)
+        if i not in RemDups:
+            RemDups.append(i)
             
-    return Dup_data
+    return RemDups
 
 def CF(x,y):
     cf = 0
@@ -315,15 +327,15 @@ def CF(x,y):
     x = list(x)
     y = list(y)
     
-    Dup_x = RemDups(x)
-    Dup_y = RemDups(y)
+    RemDups_x = RemDups(x)
+    RemDups_y = RemDups(y)
     
-    for i in Dup_x:
+    for i in RemDups_x:
         count = x.count(i)
         if count > 1:
             cf += (count * (count**2 - 1)) / 12
             
-    for i in Dup_y:
+    for i in RemDups_y:
         count = y.count(i)
         if count > 1:
             cf += (count * (count**2 - 1)) / 12
@@ -342,16 +354,15 @@ def SRCC(x, y):
     RankY = np.array(Rankify(y))
     
     # Difference of Ranks:
-    Di = np.subtract(RankX, RankY)
+    Di = RankX - RankY
     DiSq = np.square(Di)
     
     SumDiSq = mysum(DiSq)
     
     # Correction Factor:
     cf = CF(x,y)
-    
     SumDiSq += cf
-    
+
     SRCC = 1 - ((6 * SumDiSq) / (n * (n**2 - 1)))
     
     data = {
@@ -382,30 +393,30 @@ SRCC(x, y)
 # ## WEEK 5:
 # #### Write a python program to classify the data based on one way ANOVA.
 
-# In[27]:
+# In[8]:
 
 
 # ANOVA One Way Classification:
 
 k = int(input("Enter the number of Treatments: "))
-name = input("Enter name of the Treatments: ")
+Treatment = input("Enter name of the Treatments: ")
 
-Treatments = []
+Data = []
 
-# Treatments = [[90, 82, 79, 98, 83, 91], [105, 89, 93, 104, 89, 95, 86], [83, 89, 80, 94]]
+# Data = [[90, 82, 79, 98, 83, 91], [105, 89, 93, 104, 89, 95, 86], [83, 89, 80, 94]]
 
 for i in range(k):
-    a = np.array([float(j) for j in input(f"Enter {name} {i+1} values: ").strip().split()])
-    Treatments.append(a)
+    a = np.array([float(j) for j in input(f"Enter {Treatment} {i+1} values: ").strip().split()])
+    Data.append(a)
     
 alpha = float(input("Enter Level of Significance: "))
 
 Ti = Ti2 = RSS = N = 0
 
-for i in Treatments:
+for i in Data:
     Ti += mysum(i)
     Ti2 += mysum(i)**2 / mylen(i)
-    RSS += mysum(np.square(i))
+    RSS += mysum(i**2)
     N += mylen(i)
 
 CF = Ti**2 / N
@@ -422,33 +433,254 @@ if(Fcal < 1):
 
 FTable = ss.f.ppf(1-alpha, k-1, N-k)
 
-print(f"Row Sum of Squares (RSS): {RSS}")
-print(f"Correction Factor (CF): {CF}")
 print("Grand Total (G): ",Ti)
 print("Sum of Ti2/ni: ",Ti2)
+print(f"Row Sum of Squares (RSS): {RSS}")
+print(f"Correction Factor (CF): {CF}")
 print(f"Sum of Squares due to Total (SST): {SST}")
 print(f"Sum of Squares due to Treatments (SSTr): {SSTr}")
 print(f"Sum of Squares due to Error (SSE): {SSE}")
 print(f"Mean Sum of Squares due to Treatments (Mean SST): {MeanSSTr}")
 print(f"Mean Sum of Squares due to Error (Mean SSE): {MeanSSE}\n")
 
-data = {
-    "S O V": [name, "Error", "Total"],
+ANOVA_One_Way_Classification_Table = {
+    "S O V": [Treatment, "Error", "Total"],
     "S O S": ["{:.4f}".format(SSTr), "{:.4f}".format(SSE), "{:.4f}".format(SST)],
     "D O F": [k-1, N-k, N-1],
     "M S O S": ["{:.4f}".format(MeanSSTr), "{:.4f}".format(MeanSSE), " - "],
     "V R": ["F - cal = {:.4f}".format(Fcal),"~ F(K-1, N-K)",""]
 }
 
-df = pd.DataFrame(data)
+data_frame = pd.DataFrame(ANOVA_One_Way_Classification_Table)
 
-print(df) 
+print(data_frame) 
 
 print(f"\nF-Calculated Value: {Fcal}")
 print(f"F-Table Value: {FTable}")
 
 if(Fcal < FTable):
-    print(f"We Accept H0\nThere is Homogeneity among the {name}s")
+    print(f"We Accept H0\nThere is Homogeneity among the {Treatment}s")
 else:
-    print(f"We Reject H0\nThere is Heterogeneity among the {name}s")
+    print(f"We Reject H0\nThere is Heterogeneity among the {Treatment}s")
 
+
+# ## WEEK 6:
+# #### Write a python program to classify the data based on two way ANOVA.
+
+# In[43]:
+
+
+# ANOVA Two Way Classification:
+
+k = int(input("Enter the number of Treatments: "))
+h = int(input("Enter the number of Blocks: "))
+# k = 4
+# h = 5
+
+Treatment = input("Enter name of the Treatments: ")
+Block = input("Enter name of the Blocks: ")
+# Treatment = "Form"
+# Block = "Student"
+
+Data = []
+for i in range(k):
+    row = []
+    while mylen(row) != h:
+        row = np.array([float(i) for i in input(f"Enter {Treatment} {i+1} values: ").strip().split()])
+    Data.append(row)
+                       
+Data = np.array(Data)
+
+# Data = np.array([[75,73,59,69,84],[83,72,56,70,92],[86,61,53,72,88],[73,67,62,79,95]])
+
+alpha = float(input("Enter Level of Significance: "))
+# alpha = 0.05
+
+# Total no. of values:
+N = k * h
+
+Ti = [mysum(i) for i in Data]
+Ti2 = Ti**2
+SumTi2 = mysum(Ti2)
+
+Bj = Data[0]
+for i in range(1,k):
+    Bj = Bj + Data[i]
+    
+Bj2 = Bj**2
+SumBj2 = mysum(Bj2)
+
+# Grand Total:
+G = mysum(Ti) # G = mysum(Bj)
+# Row Sum of Squares:
+RSS = 0
+
+for i in Data:
+    for j in i:
+        RSS += j**2
+# Correction Factor:
+CF = G**2 / N
+
+# Sum of Squares due to Total:
+SST = RSS - CF
+# Sum of Squares due to Treatments:
+SSTr = SumTi2/h - CF
+# Sum of Squares due to Blocks:
+SSB = SumBj2/k - CF
+# Sum of Squares due to Error:
+SSE = SST - SSTr - SSB
+
+# Mean Sum of Squares due to Treatments:
+MeanSSTr = SSTr/(k-1)
+# Mean Sum of Squares due to Blocks:
+MeanSSB = SSB/(h-1)
+# Mean Sum of Squares due to Error:
+MeanSSE = SSE/((k-1)*(h-1))
+
+# F calculated value of Treatments:
+F_Tr_cal = MeanSSTr / MeanSSE
+# F calculated value of Blocks:
+F_B_cal = MeanSSB / MeanSSE
+
+if(F_Tr_cal < 1):
+    F_Tr_cal = 1 / F_Tr_cal
+
+if(F_B_cal < 1):
+    F_B_cal = 1 / F_B_cal
+
+# F table value of Treatments:
+F_Tr_Table = ss.f.ppf(1-alpha, k-1, (k-1)*(h-1))
+# F table value of Blocks:
+F_B_Table = ss.f.ppf(1-alpha, h-1, (k-1)*(h-1))
+
+print("\nTi values: ",Ti)
+print("Ti2 values: ",Ti2)
+print("Sum of Ti2: ",SumTi2)
+
+print("\nBj values: ",Bj)
+print("Bj2 values: ",Bj2)
+print("Sum of Bj2: ",SumBj2)
+
+print("\nGrand Total (G): ",G)
+print("Row Sum of Squares (RSS): ",RSS)
+print("Correction Factor (CF): {:.4f}".format(CF))
+
+print("\nSum of Squares due to Total (SST): {:.4f}".format(SST))
+print("Sum of Squares due to Treatments (SSTr): {:.4f}".format(SSTr))
+print("Sum of Squares due to Blocks (SSB): {:.4f}".format(SSB))
+print("Sum of Squares due to Error (SSE): {:.4f}".format(SSE))
+
+print("\nMean Sum of Squares due to Treatments (Mean SSTr): {:.4f}".format(MeanSSTr))
+print("Mean Sum of Squares due to Blocks (Mean SSB): {:.4f}".format(MeanSSB))
+print("Mean Sum of Squares due to Error (Mean SSE): {:.4f}\n".format(MeanSSE))
+
+ANOVA_Two_Way_Classification_Table = {
+    "S O V": [Treatment+'s', Block+'s', "Error", "Total"],
+    "S O S": ["{:.4f}".format(SSTr), "{:.4f}".format(SSB), "{:.4f}".format(SSE), "{:.4f}".format(SST)],
+    "D O F": [k-1, h-1, (k-1)*(h-1), (k*h)-1],
+    "M S O S": ["{:.4f}".format(MeanSSTr), "{:.4f}".format(MeanSSB), "{:.4f}".format(MeanSSE), " - "],
+    "V R": ["F(Tr)-cal = {:.4f}".format(F_Tr_cal), "~ F(k-1, (k-1)(h-1))", "F(B)-cal = {:.4f}".format(F_B_cal),"~ F(h-1, (k-1)(h-1))"]
+}
+
+data_frame = pd.DataFrame(ANOVA_Two_Way_Classification_Table)
+
+print(data_frame) 
+
+print(f"\nInference Related to {Treatment}s:")
+print("F(Tr)-Calculated Value: {:.4f}".format(F_Tr_cal))
+print("F(Tr)-Table Value: {:.4f}".format(F_Tr_Table))
+
+if(F_Tr_cal < F_Tr_Table):
+    print(f"We Accept H0(Tr)\nThere is Homogeneity among the {Treatment}s")
+else:
+    print(f"We Reject H0(Tr)\nThere is Heterogeneity among the {Treatment}s")
+    
+print(f"\nInference Related to {Block}s:")
+print("F(B)-Calculated Value: {:.4f}".format(F_B_cal))
+print("F(B)-Table Value: {:.4f}".format(F_B_Table))
+
+if(F_B_cal < F_B_Table):
+    print(f"We Accept H0(B)\nThere is Homogeneity among the {Block}s")
+else:
+    print(f"We Reject H0(B)\nThere is Heterogeneity among the {Block}s")
+
+
+# ## WEEK 7:
+# #### Write a python program to fit a multiple regression model for any given data.
+
+# In[13]:
+
+
+# Multiple Linear Regression Model:
+
+# variables = int(input("Enter no. of variables in the model:"))
+variables = 2
+
+if variables == 2:
+    #y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
+    #x1 = np.array([float(i) for i in input("Enter x1 values: ").strip().split()])
+    y = np.array([10,20,30,40,50])
+    x1 = np.array([5,7,10,12,20])
+    
+    leny = len(y)
+    lenx1 = len(x1)
+    
+    if lenx1 != leny:
+        print("Invalid Data!")
+    else:
+        x0 = np.array([1 for i in range(lenx1)])
+        X = [x0,x1]
+        
+        XTX = np.array([[mysum(x0**2),mysum(x0*x1)],
+                        [mysum(x1*x0),mysum(x1**2)]])
+        
+        XTX_inverse = np.linalg.inv(XTX)
+        
+        XTY = np.array([mysum(x0*y), mysum(x1*y)])
+        
+        BetaCap = [mysum(XTX_inverse[0] * XTY), mysum(XTX_inverse[1] * XTY)]
+        
+        Yfitted = np.array([BetaCap[0] + BetaCap[1]*x1])
+        
+if variables == 3:
+    y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
+    x1 = np.array([float(i) for i in input("Enter x1 values: ").strip().split()])
+    x2 = np.array([float(i) for i in input("Enter x2 values: ").strip().split()])
+    
+    leny = len(y)
+    lenx1 = len(x1)
+    lenx2 = len(x2)
+
+    if leny != lenx1 or leny != lenx2 or lenx1 != lenx2:
+        print("Invalid Data!")
+    else:
+        x0 = np.array([1 for i in range(lenx1)])
+        X = [x0,x1,x2]
+        
+        XTX = np.array([[mysum(x0**2),mysum(x0*x1),mysum(x0*x2)],
+                        [mysum(x1*x0),mysum(x1**2),mysum(x1*x2)],
+                        [mysum(x2*x0),mysum(x2*x1),mysum(x2**2)]])
+        
+        XTX_inverse = np.linalg.inv(XTX)
+        
+        XTY = np.array([mysum(x0*y), mysum(x1*y),mysum(x2*y)])
+        
+        BetaCap = [mysum(XTX_inverse[0] * XTY), mysum(XTX_inverse[1] * XTY),mysum(XTX_inverse[2] * XTY)]
+        
+        Yfitted = np.array([BetaCap[0] + BetaCap[1]*x1 + BetaCap[2]*x2])
+
+
+# ## WEEK 8:
+# #### Write a python program to fit a multivariate regression model for any given data.
+
+# ## WEEK 9:
+# #### Write a python program to classify the treatments based on MANOVA Test.
+
+# ## WEEK 10:
+# #### Write a python program to classify the given observations using Linear Discriminant Analysis.
+
+# ## WEEK 11:
+# #### Write a python program to find Principle components for the given variables.
+
+# ## WEEK 12:
+# #### Write a python program to group the given variables using Factor Analysis.
