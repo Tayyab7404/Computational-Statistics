@@ -3,7 +3,7 @@
 
 # ## Functions, Import Statements:
 
-# In[2]:
+# In[1]:
 
 
 import matplotlib.pyplot as plt
@@ -12,119 +12,118 @@ from math import sqrt
 import scipy.stats as ss
 import pandas as pd
 
-def mylen(data):
-    size = 0
-    for i in data:
-        size = size + 1
-    return size
-
-def mysum(data):
-    Sum = 0
-    for i in data:
-        Sum += i
-    return Sum
-
-def mymean(data):
-    Sum = 0
-    n = mylen(data)
-    for i in data:
-        Sum += i
-    return Sum/n
-
 # To find the f critical value
-ss.f.ppf(q=1-0.05,df=4)
+#ss.f.ppf(q=1-0.05,df=4)
 
 # To find the T critical value
-ss.t.ppf(q=1 - 0.05/2,df=4)
+#ss.t.ppf(q=1 - 0.05/2,df=4)
 
 
 # ## WEEK 1:
 # #### Write a python program to find the best fit straight line of the form y = a+bx and draw the scatter plot.
 
-# In[3]:
+# In[2]:
 
 
-# Straight Line Best Fit:
+# Linear Regression:
 
-def drawPlotLine(x, y, Ycal):
-    plt.plot(x, y)
-    plt.plot(x, Ycal)
+import matplotlib.pyplot as plt
+import numpy as np
+
+def mymean(data):
+    Sum = 0
+    n = len(data)
+    for i in data:
+        Sum += i
+    return Sum/n
+
+def drawPlotLine(x,y,Y_cal):
+    Y_color = 'green'
+    Y_cal_color = 'red'
+    plt.plot(x,y,color=Y_color,marker='o',markerfacecolor='w')
+    plt.plot(x,Y_cal,color=Y_cal_color,marker='o',markerfacecolor='w')
     plt.xlabel('x - axis')
     plt.ylabel('y - axis')
     plt.title("Best Fit Line")
     plt.show()
+    print("X-Y Graph: Green")
+    print("X-Ycal Graph: Red")
 
-def LinearRegression(x, y):
-    n = mylen(x)
-    m = mylen(y)
+def LinearRegression(x,y):
+    n = len(x)
+    m = len(y)
     
     if n != m:
         print("Invalid Data!")
         return
     
-    SumX = mysum(x)
-    SumY = mysum(y)
+    SumX = sum(x)
+    SumY = sum(y)
     
-    slope = (n*mysum(x*y) - SumX*SumY) / (n*mysum(x*x) - SumX**2)
-    
+    slope = (n*sum(x*y) - SumX*SumY) / (n*sum(x**2) - SumX**2)
     constant = (SumY - slope*SumX) / n
     
-    Ycal = slope*x + constant
+    Y_cal = slope*x + constant
     
     meanY = mymean(y)
     
-    SST = mysum([(i-meanY)**2 for i in y])
-    SSE = mysum((y-Ycal)**2)
-    SSR = mysum([(i-meanY)**2 for i in Ycal])
+    SST = sum((y-meanY)**2)
+    SSE = sum((y-Y_cal)**2)
+    SSR = sum((Y_cal-meanY)**2)
     
     Rsq = SSR/SST
     # Rsq = 1 - SSE/SST
     
-    print("X values: ",x)
-    print("Y values: ",y)
-    print("Slope (m): ",slope)
-    print("Constant (c): ",constant)
-    print("Y Calculated values: ",Ycal)
+    print("Y Calculated values: ",Y_cal)
     print("The Linear Regression Line for the given data:")
-    print(f"Y = {slope}X + {constant}")
-    print("Sum of Squares due to Total: ",SST)
-    print("Sum of Squares due to Treatments: ",SSR)
-    print("Sum of Squares due to Error: ",SSE)
-    print("R Square value: ",Rsq)
+    print("Y = ({:.4f}) + ({:.4f})X".format(constant,slope))
+    print("Sum of Squares due to Total: {:.4f}".format(SST))
+    print("Sum of Squares due to Regression: {:.4f}".format(SSR))
+    print("Sum of Squares due to Error: {:.4f}".format(SSE))
+    print("R Square value: {:.4f}".format(Rsq))
     
-    drawPlotLine(x, y, Ycal)
+    drawPlotLine(x,y,Y_cal)
     
     if Rsq > 0.9:
-        print("The Y Calculated values is the best fit for the given data")
+        print("The Regression Line Y = ({:.4f}) + ({:.4f})X is the best fit for given data".format(constant,slope))
     else:
-        print("The Y Calculated values is not the best fit for the given data")
-        
-    return Ycal
+        print("The Regression Line Y = ({:.4f}) + ({:.4f})X is not the best fit for given data".format(constant,slope))
         
 x = np.array([float(i) for i in input("Enter x values: ").strip().split()])
 y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
 
-# x = np.array([1, 2, 3, 4, 6, 8])
-# y = np.array([2.4, 3, 3.6, 4, 5, 6])
-
-LinearRegression(x, y)
+LinearRegression(x,y)
 
 
 # ## WEEK 2:
 # #### Write a python program to fit a second degree parabola of the form y = a+bx+cx2 and draw the scatter plot.
 
-# In[31]:
+# In[3]:
 
 
-# Parabola Best Fit:
+# Parabola Regression:
 
-def drawPlotParabola(x, y, Ycal):
-    plt.plot(x, y)
-    plt.plot(x, Ycal)
+import matplotlib.pyplot as plt
+import numpy as np
+
+def mymean(data):
+    Sum = 0
+    n = len(data)
+    for i in data:
+        Sum += i
+    return Sum/n
+
+def drawPlotParabola(x,y,Y_cal):
+    Y_color = 'green'
+    Y_cal_color = 'red'
+    plt.plot(x,y,color=Y_color,marker='o',markerfacecolor='w')
+    plt.plot(x,Y_cal,color=Y_cal_color,marker='o',markerfacecolor='w')
     plt.xlabel('x - axis')
     plt.ylabel('y - axis')
     plt.title("Best Fit Curve")
     plt.show()
+    print("X-Y Graph: Green")
+    print("X-Ycal Graph: Red")
 
 def DET(matrix):
     Sum = 0
@@ -135,9 +134,9 @@ def DET(matrix):
     
     return Sum
     
-def ParabolaRegression(x, y):
-    n = mylen(x)
-    m = mylen(y)
+def ParabolaRegression(x,y):
+    n = len(x)
+    m = len(y)
 
     if n != m:
         print("Invalid Data!")
@@ -149,13 +148,13 @@ def ParabolaRegression(x, y):
     xy = x*y
     x2y = x2*y
     
-    Sumx = mysum(x)
-    Sumx2 = mysum(x2)
-    Sumx3 = mysum(x3)
-    Sumx4 = mysum(x4)
-    Sumy = mysum(y)
-    Sumxy = mysum(xy)
-    Sumx2y = mysum(x2y)
+    Sumx = sum(x)
+    Sumx2 = sum(x2)
+    Sumx3 = sum(x3)
+    Sumx4 = sum(x4)
+    Sumy = sum(y)
+    Sumxy = sum(xy)
+    Sumx2y = sum(x2y)
     
     delta  = DET([[n, Sumx, Sumx2],
                   [Sumx, Sumx2, Sumx3],
@@ -177,42 +176,34 @@ def ParabolaRegression(x, y):
     b = delta2 / delta
     c = delta3 / delta
     
-    Ycal = a + b*x + c*x2
+    Y_cal = a + b*x + c*x2
     
-    meanY = mymean(y)
+    mean_Y = mymean(y)
     
-    SST = mysum([(i-meanY)**2 for i in y])
-    SSE = mysum((y - Ycal)**2)
-    SSR = mysum([(i-meanY)**2 for i in Ycal])
+    SST = sum((y-mean_Y)**2)
+    SSE = sum((y-Y_cal)**2)
+    SSR = sum((Y_cal-mean_Y)**2)
     
     Rsq = SSR/SST
     # Rsq = 1 - SSE/SST
     
-    print("X values: ",x)
-    print("Y values: ",y)
-    print("a = ",a)
-    print("b = ",b)
-    print("c = ",c)
-    print("Y Calculated values: ",Ycal)
+    print("Y Calculated values: ",Y_cal)
     print("The Parabola Regression Line for the given data: ")
-    print(f"Y = {a} + {b}X + {c}X2")
-    print("Sum of Squares due to Total: ",SST)
-    print("Sum of Squares due to Treatments: ",SSR)
-    print("Sum of Squares due to Error: ",SSE)
-    print("R Square value: ",Rsq)
+    print("Y = ({:.4f}) + ({:.4f})X + ({:.4f})X2".format(a,b,c))
+    print("Sum of Squares due to Total: {:.4f}".format(SST))
+    print("Sum of Squares due to Regression: {:.4f}".format(SSR))
+    print("Sum of Squares due to Error: {:.4f}".format(SSE))
+    print("R Square value: {:.4f}".format(Rsq))
     
-    drawPlotParabola(x, y, Ycal)
+    drawPlotParabola(x,y,Y_cal)
     
     if Rsq > 0.9:
-        print("The Y Calculated values is the best fit for the given data")
+        print("The Regression Curve Y = ({:.4f}) + ({:.4f})X + ({:.4f})X2 is the best fit for given data.".format(a,b,c))
     else:
-        print("The Y Calculated values is not the best fit for the given data")
+        print("The Regression Curve Y = ({:.4f}) + ({:.4f})X + ({:.4f})X2 is not the best fit for given data.".format(a,b,c))
 
 x = np.array([float(i) for i in input("Enter x values: ").strip().split()])
 y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
-
-# x = np.array([2, 4, 6, 8, 10])
-# y = np.array([3.07, 12.85, 31.47, 57.38, 91.29])
 
 ParabolaRegression(x, y)
 
@@ -220,34 +211,41 @@ ParabolaRegression(x, y)
 # ## WEEK 3:
 # #### Write a python program to find Karl Pearson’s correlation coefficient between X and Y variables.
 
-# In[29]:
+# In[5]:
 
 
 # Karl Pearson's Correlation Coefficient:
 
-def CovXY(x, y):
-    n = mylen(x)
+import numpy as np
+from math import sqrt
+
+def mymean(data):
+    Sum = 0
+    n = len(data)
+    for i in data:
+        Sum += i
+        
+    return Sum/n
+
+def CovXY(x,y):
+    n = len(x)
     meanX = mymean(x)
     meanY = mymean(y)
-    
-    SumXY = mysum(x*y)
-    
-    CovXY = SumXY/n - meanX*meanY
+    SumXY = sum(x*y)
+    CovXY = (SumXY/n) - (meanX*meanY)
     
     return CovXY
     
 def SD(x):
-    n = mylen(x)
+    n = len(x)
     meanx = mymean(x)
-    
-    Sumx2 = mysum(x**2)
-    
-    var = Sumx2/n - meanx**2
+    Sumx2 = sum(x**2)
+    var = (Sumx2/n) - (meanx**2)
     
     return sqrt(var)
 
-def KPCC(x, y):
-    if mylen(x) != mylen(y):
+def KPCC(x,y):
+    if len(x) != len(y):
         print("Invalid Data!")
         return
     
@@ -255,24 +253,21 @@ def KPCC(x, y):
     SDx = SD(x)
     SDy = SD(y)
     
-    KPCC = Covxy / (SDx * SDy)
+    KPCC = Covxy / (SDx*SDy)
     
-    print("Co-variance of X and Y = ",Covxy)
-    print("Standard Deviation of X = ",SDx)
-    print("Standard Deviation of Y = ",SDy)
+    print("Co-variance of X and Y = {:.4f}".format(Covxy))
+    print("Standard Deviation of X = {:.4f}".format(SDx))
+    print("Standard Deviation of Y = {:.4f}".format(SDy))
     
     if KPCC > -1 and KPCC < 1:
-        print(f"The Karl Pearson's Correlation Coefficient of the given data is: {KPCC}")
+        print("The Karl Pearson's Correlation Coefficient of the given data is: {:.4f}".format(KPCC))
     else:
         print("Invalid Data!")
     
 x = np.array([float(i) for i in input("Enter x values: ").strip().split()])
 y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
 
-# x = np.array([16,21,26,23,28,24,17,22,21])
-# y = np.array([33,38,50,39,52,47,35,43,41])
-
-KPCC = KPCC(x, y)
+KPCC = KPCC(x,y)
 
 
 # ## WEEK 4:
@@ -283,29 +278,31 @@ KPCC = KPCC(x, y)
 
 # Spearman's Rank Correlation Coefficient:
 
+import pandas as pd
+import numpy as np
+
 def Rankify(data):
     N = len(data)
-    
     Ranks = [None for i in range(N)]
- 
+    
     for i in range(N):
         BigNums = 1
         SameNums = 0
- 
+        
         # Count no of bigger elements from 0 to current number-1
         for j in range(i):
             if (data[j] > data[i]):
                 BigNums += 1
             if (data[j] == data[i]):
                 SameNums += 1
- 
+                
         # Count no of bigger elements from current number+1 to N-1
-        for j in range(i+1, N):
+        for j in range(i+1,N):
             if (data[j] > data[i]):
                 BigNums += 1
             if (data[j] == data[i]):
                 SameNums += 1
- 
+                
         # Use Fractional Rank formula
         # fractional_rank = BigNums + SameNums/2
         Ranks[i] = BigNums + SameNums/2
@@ -313,41 +310,39 @@ def Rankify(data):
     return Ranks
 
 def RemDups(data):
-    RemDups = []
+    set_data = []
     
     for i in data:
-        if i not in RemDups:
-            RemDups.append(i)
+        if i not in set_data:
+            set_data.append(i)
             
-    return RemDups
+    return set_data
 
 def CF(x,y):
     cf = 0
-    
     x = list(x)
     y = list(y)
+    set_x = RemDups(x)
+    set_y = RemDups(y)
     
-    RemDups_x = RemDups(x)
-    RemDups_y = RemDups(y)
-    
-    for i in RemDups_x:
-        count = x.count(i)
-        if count > 1:
-            cf += (count * (count**2 - 1)) / 12
+    for i in set_x:
+        count_x = x.count(i)
+        if count_x > 1:
+            cf += (count_x * (count_x**2 - 1)) / 12
             
-    for i in RemDups_y:
-        count = y.count(i)
-        if count > 1:
-            cf += (count * (count**2 - 1)) / 12
+    for i in set_y:
+        count_y = y.count(i)
+        if count_y > 1:
+            cf += (count_y * (count_y**2 - 1)) / 12
     
     return cf
 
-def SRCC(x, y):
+def SRCC(x,y):
     n = len(x)
     m = len(y)
 
     if n != m:
-        print("Invalid Data: ")
+        print("Invalid Data!")
         return
     
     RankX = np.array(Rankify(x))
@@ -355,9 +350,9 @@ def SRCC(x, y):
     
     # Difference of Ranks:
     Di = RankX - RankY
-    DiSq = np.square(Di)
+    DiSq = Di**2
     
-    SumDiSq = mysum(DiSq)
+    SumDiSq = sum(DiSq)
     
     # Correction Factor:
     cf = CF(x,y)
@@ -365,90 +360,110 @@ def SRCC(x, y):
 
     SRCC = 1 - ((6 * SumDiSq) / (n * (n**2 - 1)))
     
-    data = {
+    SRCC_Table = {
         "X values": x,
         "Y values": y,
         "Ranks of X": RankX,
         "Ranks of Y": RankY,
         "Di values": Di,
-        "Di sq. values": DiSq,
-    }
+        "Di sq. values": DiSq}
     
-    dataframe = pd.DataFrame(data)
-    print(dataframe)
+    print(pd.DataFrame(SRCC_Table))
     
     print("Correction Factor: ",cf)
-    print("Sum of Di sq. = ",SumDiSq)
-    print(f"The Spearman's Ranked Correlation Coefficient of the given data = {SRCC}")
+    print("Sum of Di sq: ",SumDiSq)
+    print("The Spearman's Ranked Correlation Coefficient of the given data: {:.4f}".format(SRCC))
     
 x = np.array([float(i) for i in input("Enter x values: ").strip().split()])
 y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
 
-# x = np.array([68, 64, 75, 50, 64, 80, 75, 40, 55, 64])
-# y = np.array([62, 58, 68, 45, 81, 60, 68, 48, 50, 70])
-
-SRCC(x, y)
+SRCC(x,y)
 
 
 # ## WEEK 5:
 # #### Write a python program to classify the data based on one way ANOVA.
 
-# In[8]:
+# In[12]:
 
 
 # ANOVA One Way Classification:
 
+import pandas as pd
+import numpy as np
+import scipy.stats as ss
+
 k = int(input("Enter the number of Treatments: "))
+#k = 4
 Treatment = input("Enter name of the Treatments: ")
+#Treatment = "Technician"
 
 Data = []
 
-# Data = [[90, 82, 79, 98, 83, 91], [105, 89, 93, 104, 89, 95, 86], [83, 89, 80, 94]]
+#Data = [[6, 14, 10 ,8 ,11], [14, 9 ,12, 10, 14], [10 ,12 ,7, 15, 11],[9, 12, 8, 10, 11]]
 
 for i in range(k):
     a = np.array([float(j) for j in input(f"Enter {Treatment} {i+1} values: ").strip().split()])
     Data.append(a)
-    
+
+Data = np.array(Data)
 alpha = float(input("Enter Level of Significance: "))
+#alpha = 0.01
 
-Ti = Ti2 = RSS = N = 0
+print(f"\nNull Hypothesis (H0): There is Homogenity among the {Treatment}s")
+print(f"Alternate Hypothesis (H1): There is Heterogenity among the {Treatment}s\n")
 
+# Total No. of values (N):
+# Sum of Treatments (Ti):
+# Row sum of squares (RSS):
+N = Ti = Ti2 = RSS = 0
 for i in Data:
-    Ti += mysum(i)
-    Ti2 += mysum(i)**2 / mylen(i)
-    RSS += mysum(i**2)
-    N += mylen(i)
+    Ti += sum(i)
+    Ti2 += sum(i)**2 / len(i)
+    RSS += sum(i**2)
+    N += len(i)
 
+# Correction Factor (CF):
 CF = Ti**2 / N
-SST = RSS - CF
-SSTr = Ti2 - CF
-SSE = SST - SSTr
-MeanSSTr = SSTr / (k-1)
-MeanSSE = SSE / (N-k)
 
+# Sum of Squares due to Total (SST):
+SST = RSS - CF
+# Sum of Squares due to Treatments (SSTr):
+SSTr = Ti2 - CF
+# Sum of Squares due to Error (SSE):
+SSE = SST - SSTr
+
+# Mean Sum of Squares due to Treatments (MeanSSTr):
+MeanSSTr = SSTr/(k-1)
+# Mean Sum of Squares due to Error (MeanSSE):
+MeanSSE = SSE/(N-k)
+
+# F calculated value:
 Fcal = MeanSSTr / MeanSSE
+
+# F table value:
+FTable = ss.f.ppf(1-alpha, k-1, N-k)
+
+# Degrees of Freedom:
+DOF = f"~ F({k-1},{N-k})"
 
 if(Fcal < 1):
     Fcal = 1 / Fcal
+    FTable = ss.f.ppf(1-alpha, N-k, k-1)
+    DOF = f"~ F({N-k},{k-1})"
 
-FTable = ss.f.ppf(1-alpha, k-1, N-k)
+print("Sum of Squares due to Total (SST): {:.4f}".format(SST))
+print("Sum of Squares due to Treatments (SSTr): {:.4f}".format(SSTr))
+print("Sum of Squares due to Error (SSE): {:.4f}\n".format(SSE))
 
-print("Grand Total (G): ",Ti)
-print("Sum of Ti2/ni: ",Ti2)
-print(f"Row Sum of Squares (RSS): {RSS}")
-print(f"Correction Factor (CF): {CF}")
-print(f"Sum of Squares due to Total (SST): {SST}")
-print(f"Sum of Squares due to Treatments (SSTr): {SSTr}")
-print(f"Sum of Squares due to Error (SSE): {SSE}")
-print(f"Mean Sum of Squares due to Treatments (Mean SST): {MeanSSTr}")
-print(f"Mean Sum of Squares due to Error (Mean SSE): {MeanSSE}\n")
+print("Mean Sum of Squares due to Treatments (Mean SST): {:.4f}".format(MeanSSTr))
+print("Mean Sum of Squares due to Error (Mean SSE): {:.4f}\n".format(MeanSSE))
 
 ANOVA_One_Way_Classification_Table = {
     "S O V": [Treatment, "Error", "Total"],
     "S O S": ["{:.4f}".format(SSTr), "{:.4f}".format(SSE), "{:.4f}".format(SST)],
     "D O F": [k-1, N-k, N-1],
     "M S O S": ["{:.4f}".format(MeanSSTr), "{:.4f}".format(MeanSSE), " - "],
-    "V R": ["F - cal = {:.4f}".format(Fcal),"~ F(K-1, N-K)",""]
+    "V R": ["F-cal = {:.4f}".format(Fcal), DOF, ""]
 }
 
 data_frame = pd.DataFrame(ANOVA_One_Way_Classification_Table)
@@ -456,7 +471,7 @@ data_frame = pd.DataFrame(ANOVA_One_Way_Classification_Table)
 print(data_frame) 
 
 print(f"\nF-Calculated Value: {Fcal}")
-print(f"F-Table Value: {FTable}")
+print(f"F-Table Value: {FTable}\n")
 
 if(Fcal < FTable):
     print(f"We Accept H0\nThere is Homogeneity among the {Treatment}s")
@@ -467,120 +482,133 @@ else:
 # ## WEEK 6:
 # #### Write a python program to classify the data based on two way ANOVA.
 
-# In[43]:
+# In[11]:
 
 
 # ANOVA Two Way Classification:
 
+import pandas as pd
+import numpy as np
+import scipy.stats as ss
+
+def mymean(data):
+    Sum = 0
+    n = len(data)
+    for i in data:
+        Sum += i
+        
+    return Sum/n
+
 k = int(input("Enter the number of Treatments: "))
 h = int(input("Enter the number of Blocks: "))
-# k = 4
-# h = 5
+#k = 4
+#h = 5
 
 Treatment = input("Enter name of the Treatments: ")
 Block = input("Enter name of the Blocks: ")
-# Treatment = "Form"
-# Block = "Student"
+#Treatment = "Form"
+#Block = "Student"
 
 Data = []
 for i in range(k):
     row = []
-    while mylen(row) != h:
+    while len(row) != h:
         row = np.array([float(i) for i in input(f"Enter {Treatment} {i+1} values: ").strip().split()])
     Data.append(row)
                        
 Data = np.array(Data)
 
-# Data = np.array([[75,73,59,69,84],[83,72,56,70,92],[86,61,53,72,88],[73,67,62,79,95]])
-
 alpha = float(input("Enter Level of Significance: "))
-# alpha = 0.05
+#alpha = 0.05
 
-# Total no. of values:
+print(f"\nNull Hypothesis: There is Homogenity among the {Treatment}s")
+print(f"Alternate Hypothesis: There is Heterogenity among the {Treatment}s\n")
+
+# Total no. of values (N):
 N = k * h
 
-Ti = [mysum(i) for i in Data]
+# Sum of Treatments (Ti):
+Ti = np.array([sum(i) for i in Data])
 Ti2 = Ti**2
-SumTi2 = mysum(Ti2)
+SumTi2 = sum(Ti2)
 
+# Sum of Blocks (Bj):
 Bj = Data[0]
 for i in range(1,k):
     Bj = Bj + Data[i]
     
 Bj2 = Bj**2
-SumBj2 = mysum(Bj2)
+SumBj2 = sum(Bj2)
 
-# Grand Total:
-G = mysum(Ti) # G = mysum(Bj)
-# Row Sum of Squares:
+# Grand Total (G):
+G = sum(Ti) 
+
+# Row Sum of Squares (RSS):
 RSS = 0
-
 for i in Data:
     for j in i:
         RSS += j**2
-# Correction Factor:
+        
+# Correction Factor (CF):
 CF = G**2 / N
 
-# Sum of Squares due to Total:
+# Sum of Squares due to Total (SST):
 SST = RSS - CF
-# Sum of Squares due to Treatments:
+# Sum of Squares due to Treatments (SSTr):
 SSTr = SumTi2/h - CF
-# Sum of Squares due to Blocks:
+# Sum of Squares due to Blocks (SSB):
 SSB = SumBj2/k - CF
-# Sum of Squares due to Error:
+# Sum of Squares due to Error (SSE):
 SSE = SST - SSTr - SSB
 
-# Mean Sum of Squares due to Treatments:
+# Mean Sum of Squares due to Treatments (MeanSSTr):
 MeanSSTr = SSTr/(k-1)
-# Mean Sum of Squares due to Blocks:
+# Mean Sum of Squares due to Blocks (MeanSSB):
 MeanSSB = SSB/(h-1)
-# Mean Sum of Squares due to Error:
+# Mean Sum of Squares due to Error (MeanSSE):
 MeanSSE = SSE/((k-1)*(h-1))
 
-# F calculated value of Treatments:
+# F calculated value of Treatments (F(Tr)):
 F_Tr_cal = MeanSSTr / MeanSSE
-# F calculated value of Blocks:
+# F calculated value of Blocks (F(B)):
 F_B_cal = MeanSSB / MeanSSE
-
-if(F_Tr_cal < 1):
-    F_Tr_cal = 1 / F_Tr_cal
-
-if(F_B_cal < 1):
-    F_B_cal = 1 / F_B_cal
 
 # F table value of Treatments:
 F_Tr_Table = ss.f.ppf(1-alpha, k-1, (k-1)*(h-1))
 # F table value of Blocks:
 F_B_Table = ss.f.ppf(1-alpha, h-1, (k-1)*(h-1))
 
-print("\nTi values: ",Ti)
-print("Ti2 values: ",Ti2)
-print("Sum of Ti2: ",SumTi2)
+# Degrees of Freedom for Treatments:
+F_Tr_DOF = f"~ F({k-1},{(k-1)*(h-1)})"
+# Degrees of Freedom for Blocks:
+F_B_DOF = f"~ F({h-1},{(k-1)*(h-1)})"
 
-print("\nBj values: ",Bj)
-print("Bj2 values: ",Bj2)
-print("Sum of Bj2: ",SumBj2)
+if(F_Tr_cal < 1):
+    F_Tr_cal = 1 / F_Tr_cal
+    F_Tr_Table = ss.f.ppf(1-alpha,(k-1)*(h-1), k-1)
+    F_Tr_DOF = f"~ F({(k-1)*(h-1)},{k-1})"
 
-print("\nGrand Total (G): ",G)
-print("Row Sum of Squares (RSS): ",RSS)
-print("Correction Factor (CF): {:.4f}".format(CF))
+if(F_B_cal < 1):
+    F_B_cal = 1 / F_B_cal
+    F_B_Table = ss.f.ppf(1-alpha,(k-1)*(h-1), h-1)
+    F_B_DOF = f"~ F({(k-1)*(h-1)},{h-1})"
 
-print("\nSum of Squares due to Total (SST): {:.4f}".format(SST))
+print("Sum of Squares due to Total (SST): {:.4f}".format(SST))
 print("Sum of Squares due to Treatments (SSTr): {:.4f}".format(SSTr))
 print("Sum of Squares due to Blocks (SSB): {:.4f}".format(SSB))
-print("Sum of Squares due to Error (SSE): {:.4f}".format(SSE))
+print("Sum of Squares due to Error (SSE): {:.4f}\n".format(SSE))
 
-print("\nMean Sum of Squares due to Treatments (Mean SSTr): {:.4f}".format(MeanSSTr))
+print("Mean Sum of Squares due to Treatments (Mean SSTr): {:.4f}".format(MeanSSTr))
 print("Mean Sum of Squares due to Blocks (Mean SSB): {:.4f}".format(MeanSSB))
 print("Mean Sum of Squares due to Error (Mean SSE): {:.4f}\n".format(MeanSSE))
 
 ANOVA_Two_Way_Classification_Table = {
-    "S O V": [Treatment+'s', Block+'s', "Error", "Total"],
+    "S O V": [Treatment, Block, "Error", "Total"],
     "S O S": ["{:.4f}".format(SSTr), "{:.4f}".format(SSB), "{:.4f}".format(SSE), "{:.4f}".format(SST)],
     "D O F": [k-1, h-1, (k-1)*(h-1), (k*h)-1],
     "M S O S": ["{:.4f}".format(MeanSSTr), "{:.4f}".format(MeanSSB), "{:.4f}".format(MeanSSE), " - "],
-    "V R": ["F(Tr)-cal = {:.4f}".format(F_Tr_cal), "~ F(k-1, (k-1)(h-1))", "F(B)-cal = {:.4f}".format(F_B_cal),"~ F(h-1, (k-1)(h-1))"]
-}
+    "V R": ["F(Tr)-cal = {:.4f}".format(F_Tr_cal), F_Tr_DOF, 
+            "F(B)-cal = {:.4f}".format(F_B_cal), F_B_DOF]}
 
 data_frame = pd.DataFrame(ANOVA_Two_Way_Classification_Table)
 
@@ -588,31 +616,59 @@ print(data_frame)
 
 print(f"\nInference Related to {Treatment}s:")
 print("F(Tr)-Calculated Value: {:.4f}".format(F_Tr_cal))
-print("F(Tr)-Table Value: {:.4f}".format(F_Tr_Table))
+print("F(Tr)-Table Value: {:.4f}\n".format(F_Tr_Table))
 
 if(F_Tr_cal < F_Tr_Table):
-    print(f"We Accept H0(Tr)\nThere is Homogeneity among the {Treatment}s")
+    print(f"We Accept H0(Tr)\nThere is Homogeneity among the {Treatment}s\n")
 else:
-    print(f"We Reject H0(Tr)\nThere is Heterogeneity among the {Treatment}s")
+    print(f"We Reject H0(Tr)\nThere is Heterogeneity among the {Treatment}s\n")
     
 print(f"\nInference Related to {Block}s:")
 print("F(B)-Calculated Value: {:.4f}".format(F_B_cal))
-print("F(B)-Table Value: {:.4f}".format(F_B_Table))
+print("F(B)-Table Value: {:.4f}\n".format(F_B_Table))
 
 if(F_B_cal < F_B_Table):
-    print(f"We Accept H0(B)\nThere is Homogeneity among the {Block}s")
+    print(f"We Accept H0(B)\nThere is Homogeneity among the {Block}s\n")
 else:
-    print(f"We Reject H0(B)\nThere is Heterogeneity among the {Block}s")
+    print(f"We Reject H0(B)\nThere is Heterogeneity among the {Block}s\n")
 
 
 # ## WEEK 7:
 # #### Write a python program to fit a multiple regression model for any given data.
 
-# In[13]:
+# In[12]:
 
 
 # Multiple Linear Regression Model:
 
+def GoodnessOfFit(y , Yfitted):
+    print("To Test Goodness of Fit using Determination of Coefficients (R2):")
+    Residual = y - Yfitted
+    y_ybar = y-ybar
+
+    SSE = mysum(Residual**2)
+    SST = mysum(y_ybar**2)
+    SSR = SST - SSE
+
+    Rsq = SSR/SST
+
+    print(f"Y fitted values: {Yfitted}")
+    print(f"Residual values: {Residual}")
+    print(f"Y - Ybar values: {y_ybar}")
+    print(f"Sum of Squares due to Error (SSE): {SSE}")
+    print(f"Sum of Squares due to Total (SST): {SST}")
+    print(f"Sum of Squares due to Regression (SSR): {SSR}")
+    print(f"Coefficient of Determination (R2): {Rsq}")
+
+    if Rsq < 0.9:
+        print("The Multiple Regression Model is not a Good Fit for the given data.")
+    else:
+        print("The Multiple Regression Model is a Good Fit for the given data.")
+        
+def ParameterTesting(BetaCap, XTX_inverse):
+    print("To Test the individual parameters using T-Test:")
+    
+        
 # variables = int(input("Enter no. of variables in the model:"))
 variables = 2
 
@@ -640,16 +696,24 @@ if variables == 2:
         
         BetaCap = [mysum(XTX_inverse[0] * XTY), mysum(XTX_inverse[1] * XTY)]
         
-        Yfitted = np.array([BetaCap[0] + BetaCap[1]*x1])
+        Yfitted = np.array(BetaCap[0] + BetaCap[1]*x1)
+        print("Multiple Linear Regression Model for the given data:")
+        print(f"Y = {BetaCap[0]} + {BetaCap[1]}X1")
+        
+        GoodnessOfFit(y,Yfitted)
         
 if variables == 3:
-    y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
-    x1 = np.array([float(i) for i in input("Enter x1 values: ").strip().split()])
-    x2 = np.array([float(i) for i in input("Enter x2 values: ").strip().split()])
+    #y = np.array([float(i) for i in input("Enter y values: ").strip().split()])
+    #x1 = np.array([float(i) for i in input("Enter x1 values: ").strip().split()])
+    #x2 = np.array([float(i) for i in input("Enter x2 values: ").strip().split()])
+    y = np.array([100,110,105,94,95,99,104,108,105,98,103,110])
+    x1 = np.array([9,8,7,14,12,10,7,4,6,5,7,6])
+    x2 = np.array([62,58,64,60,63,57,55,56,59,61,57,60])
     
     leny = len(y)
     lenx1 = len(x1)
     lenx2 = len(x2)
+    ybar = mymean(y)
 
     if leny != lenx1 or leny != lenx2 or lenx1 != lenx2:
         print("Invalid Data!")
@@ -667,7 +731,16 @@ if variables == 3:
         
         BetaCap = [mysum(XTX_inverse[0] * XTY), mysum(XTX_inverse[1] * XTY),mysum(XTX_inverse[2] * XTY)]
         
-        Yfitted = np.array([BetaCap[0] + BetaCap[1]*x1 + BetaCap[2]*x2])
+        Yfitted = np.array(BetaCap[0] + BetaCap[1]*x1 + BetaCap[2]*x2)
+        print("Multiple Linear Regression Model for the given data:")
+        print(f"Y = {BetaCap[0]} + {BetaCap[1]}X1 + {BetaCap[2]}X2")
+        
+        GoodnessOfFit(y,Yfitted)
+        
+        ParameterTesting(BetaCap, XTX_inverse)
+        
+else:
+    print("This program cannot find MLR Models for more than 3 variable data.")
 
 
 # ## WEEK 8:
